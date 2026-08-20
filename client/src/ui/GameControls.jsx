@@ -5,7 +5,7 @@ function GameControls({
   return (
     <div className="mt-6 flex gap-3">
 
-      <button
+      {/* <button
         onClick={onUndo}
         className="
           rounded-xl
@@ -19,9 +19,9 @@ function GameControls({
         "
       >
         ↩ Undo
-      </button>
+      </button> */}
 
-      <button
+      {/* <button
         onClick={onRestart}
         className="
           rounded-xl
@@ -35,7 +35,7 @@ function GameControls({
         "
       >
         🔄 Restart
-      </button>
+      </button> */}
 
     </div>
   );

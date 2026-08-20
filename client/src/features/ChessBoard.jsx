@@ -1,12 +1,16 @@
 import { Chessboard } from "react-chessboard";
 
-import { useChessGame } from "../hooks/useChessGame"
+import { useChessGame } from "../hooks/useChessGame";
 
-import PromotionModal from "../ui/PromotionModal"
+import PromotionModal from "../ui/PromotionModal";
 import GameControls from "../ui/GameControls";
+import GameOverModal from "../ui/GameOverModal";
 
 
-function ChessBoard() {
+function ChessBoard({
+  gameData,
+  onGoToLobby,
+}) {
 
   const {
     position,
@@ -17,18 +21,49 @@ function ChessBoard() {
     onPieceDrop,
     promotePiece,
     undoMove,
-    restartGame,
 
-  } = useChessGame();
+    playAgain,
+
+    goToLobby: leaveGame,
+
+  } = useChessGame(gameData);
+
+
+  // ==========================================
+  // GO TO LOBBY
+  // ==========================================
+
+  function handleGoToLobby() {
+
+    console.log(
+      "Leaving game and returning to lobby..."
+    );
+
+    // Tell server
+    leaveGame();
+
+    // Tell React/App to show lobby
+    onGoToLobby();
+
+  }
 
 
   const chessboardOptions = {
+
     position,
+
     onPieceDrop,
+
+    boardOrientation:
+      gameData.color === "b"
+        ? "black"
+        : "white",
+
   };
 
 
   return (
+
     <div className="
       relative
       flex
@@ -42,9 +77,7 @@ function ChessBoard() {
       p-4
     ">
 
-      {/* =========================
-          HEADER
-      ========================= */}
+      {/* HEADER */}
 
       <div className="mb-5 text-center">
 
@@ -57,27 +90,19 @@ function ChessBoard() {
           Chess Game
         </h1>
 
-        <p
-          className={`
-            mt-2
-            text-lg
-            font-semibold
-            ${
-              gameOver
-                ? "text-yellow-400"
-                : "text-gray-300"
-            }
-          `}
-        >
+        <p className="
+          mt-2
+          text-lg
+          font-semibold
+          text-gray-300
+        ">
           {status}
         </p>
 
       </div>
 
 
-      {/* =========================
-          CHESS BOARD
-      ========================= */}
+      {/* BOARD */}
 
       <div className="
         w-full
@@ -95,52 +120,36 @@ function ChessBoard() {
       </div>
 
 
-      {/* =========================
-          CONTROLS
-      ========================= */}
+      {/* CONTROLS */}
 
       <GameControls
         onUndo={undoMove}
-        onRestart={restartGame}
+        onRestart={handleGoToLobby}
       />
 
 
-      {/* =========================
-          GAME OVER
-      ========================= */}
-
-      {gameOver && (
-
-        <button
-          onClick={restartGame}
-          className="
-            mt-5
-            rounded-xl
-            bg-yellow-500
-            px-6
-            py-3
-            font-bold
-            text-black
-            transition
-            hover:bg-yellow-400
-          "
-        >
-          Play Again
-        </button>
-
-      )}
-
-
-      {/* =========================
-          PROMOTION
-      ========================= */}
+      {/* PROMOTION */}
 
       <PromotionModal
         promotion={promotion}
         onSelect={promotePiece}
       />
 
+
+      {/* GAME OVER */}
+
+      {gameOver && (
+
+        <GameOverModal
+          status={status}
+          onPlayAgain={playAgain}
+          onGoToLobby={handleGoToLobby}
+        />
+
+      )}
+
     </div>
+
   );
 }
 
