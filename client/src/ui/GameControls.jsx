@@ -1,6 +1,7 @@
 function GameControls({
   onUndo,
   onRestart,
+  onResign,
 }) {
   return (
     <div className="mt-6 flex gap-3">
@@ -36,6 +37,22 @@ function GameControls({
       >
         🔄 Restart
       </button> */}
+
+      <button
+        onClick={onResign}
+        className="
+          rounded-xl
+          bg-red-600
+          px-5
+          py-3
+          font-semibold
+          text-white
+          transition
+          hover:bg-red-700
+        "
+      >
+        🏳 Resign
+      </button>
 
     </div>
   );

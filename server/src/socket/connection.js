@@ -1,6 +1,7 @@
 import { registerGameHandlers } from "./gameHandlers.js";
 import { registerRematchHandler } from "./rematchHandler.js";
-
+import { registerResignHandler } from "./resignHandler.js";
+import {  registerReconnectHandler } from "./reconnectHandler.js";
 
 export function registerSocketHandlers(io) {
 
@@ -12,23 +13,11 @@ export function registerSocketHandlers(io) {
     );
 
 
-    /*
-    ==========================================
-    GAME EVENTS
-    ==========================================
-    */
-
     registerGameHandlers(
       io,
       socket
     );
 
-
-    /*
-    ==========================================
-    REMATCH EVENTS
-    ==========================================
-    */
 
     registerRematchHandler(
       io,
@@ -36,11 +25,16 @@ export function registerSocketHandlers(io) {
     );
 
 
-    /*
-    ==========================================
-    DISCONNECT
-    ==========================================
-    */
+    registerResignHandler(
+      io,
+      socket
+    );
+
+    registerReconnectHandler(
+    io,
+    socket
+    );
+
 
     socket.on("disconnect", () => {
 

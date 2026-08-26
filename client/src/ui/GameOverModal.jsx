@@ -1,11 +1,14 @@
 function GameOverModal({
   status,
+  gameEndReason,
   onPlayAgain,
   onGoToLobby,
 }) {
 
-  return (
+  const isResignation =
+    gameEndReason === "resignation";
 
+  return (
     <div className="
       fixed
       inset-0
@@ -20,12 +23,14 @@ function GameOverModal({
       <div className="
         w-full
         max-w-md
-        rounded-3xl
+        rounded-2xl
         bg-gray-900
         p-8
         text-center
         shadow-2xl
       ">
+
+        {/* TITLE */}
 
         <h2 className="
           text-3xl
@@ -36,9 +41,11 @@ function GameOverModal({
         </h2>
 
 
+        {/* RESULT */}
+
         <p className="
           mt-4
-          text-xl
+          text-lg
           font-semibold
           text-yellow-400
         ">
@@ -46,45 +53,52 @@ function GameOverModal({
         </p>
 
 
+        {/* BUTTONS */}
+
         <div className="
           mt-8
           flex
           flex-col
           gap-3
-          sm:flex-row
         ">
 
-          <button
-            onClick={onPlayAgain}
-            className="
-              flex-1
-              rounded-xl
-              bg-yellow-500
-              px-5
-              py-3
-              font-bold
-              text-black
-              hover:bg-yellow-400
-            "
-          >
-            Play Again
-          </button>
+          {/* PLAY AGAIN */}
 
+          {!isResignation && (
+            <button
+              onClick={onPlayAgain}
+              className="
+                rounded-xl
+                bg-yellow-500
+                px-6
+                py-3
+                font-bold
+                text-black
+                transition
+                hover:bg-yellow-400
+              "
+            >
+              🔄 Play Again
+            </button>
+          )}
+
+
+          {/* GO TO LOBBY */}
 
           <button
             onClick={onGoToLobby}
             className="
-              flex-1
               rounded-xl
               bg-gray-700
-              px-5
+              px-6
               py-3
-              font-bold
+              font-semibold
               text-white
+              transition
               hover:bg-gray-600
             "
           >
-            Go to Lobby
+            🏠 Go to Lobby
           </button>
 
         </div>
@@ -92,9 +106,7 @@ function GameOverModal({
       </div>
 
     </div>
-
   );
 }
-
 
 export default GameOverModal;

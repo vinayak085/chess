@@ -49,6 +49,9 @@ export function useChessGame(gameData) {
   const [promotion, setPromotion] =
     useState(null);
 
+  const [gameEndReason, setGameEndReason] =
+  useState(null);
+
 
   /*
   ==========================================
@@ -144,10 +147,10 @@ export function useChessGame(gameData) {
   const {
     playAgain,
     goToLobby,
+    resignGame,
   } = useChessMultiplayer({
 
     chess,
-
     gameData,
 
     setPosition,
@@ -159,8 +162,10 @@ export function useChessGame(gameData) {
     setPromotion,
 
     updateStatus,
+    setGameEndReason,
 
   });
+
 
 
   /*
@@ -187,22 +192,18 @@ export function useChessGame(gameData) {
   return {
 
     position,
-
     status,
-
     gameOver,
-
     promotion,
+    gameEndReason,
 
     onPieceDrop,
-
     promotePiece,
-
     undoMove,
-
+    
     playAgain,
-
     goToLobby,
+    resignGame,
 
   };
 }

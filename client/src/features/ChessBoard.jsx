@@ -12,19 +12,32 @@ function ChessBoard({
   onGoToLobby,
 }) {
 
+  console.log("====================================");
+  console.log("♟️ CHESS BOARD");
+  console.log("====================================");
+
+  console.log("gameData:", gameData);
+
+  console.log("gameId:", gameData?.gameId);
+  console.log("color:", gameData?.color);
+  console.log("position:", gameData?.position);
+  console.log("turn:", gameData?.turn);
+
+
   const {
     position,
     status,
     gameOver,
     promotion,
+    gameEndReason,
 
     onPieceDrop,
     promotePiece,
     undoMove,
 
     playAgain,
-
     goToLobby: leaveGame,
+    resignGame,
 
   } = useChessGame(gameData);
 
@@ -44,9 +57,34 @@ function ChessBoard({
 
     // Tell React/App to show lobby
     onGoToLobby();
-
   }
 
+
+  // ==========================================
+  // RESIGN
+  // ==========================================
+
+  function handleResign() {
+
+    if (gameOver) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Are you sure you want to resign this game?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    resignGame();
+  }
+
+
+  // ==========================================
+  // CHESSBOARD OPTIONS
+  // ==========================================
 
   const chessboardOptions = {
 
@@ -125,6 +163,7 @@ function ChessBoard({
       <GameControls
         onUndo={undoMove}
         onRestart={handleGoToLobby}
+        onResign={handleResign}
       />
 
 
@@ -142,6 +181,7 @@ function ChessBoard({
 
         <GameOverModal
           status={status}
+          gameEndReason={gameEndReason}
           onPlayAgain={playAgain}
           onGoToLobby={handleGoToLobby}
         />
