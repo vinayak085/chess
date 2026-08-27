@@ -280,6 +280,9 @@ export function registerGameHandlers(io, socket) {
           isDraw:
             game.chess.isDraw(),
 
+           playerId:
+             socket.id,
+
         };
 
 

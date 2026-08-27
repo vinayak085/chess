@@ -12,18 +12,6 @@ function ChessBoard({
   onGoToLobby,
 }) {
 
-  console.log("====================================");
-  console.log("♟️ CHESS BOARD");
-  console.log("====================================");
-
-  console.log("gameData:", gameData);
-
-  console.log("gameId:", gameData?.gameId);
-  console.log("color:", gameData?.color);
-  console.log("position:", gameData?.position);
-  console.log("turn:", gameData?.turn);
-
-
   const {
     position,
     status,
@@ -49,14 +37,13 @@ function ChessBoard({
   function handleGoToLobby() {
 
     console.log(
-      "Leaving game and returning to lobby..."
+      "🏠 Leaving game and returning to lobby..."
     );
 
-    // Tell server
     leaveGame();
 
-    // Tell React/App to show lobby
     onGoToLobby();
+
   }
 
 
@@ -75,10 +62,20 @@ function ChessBoard({
     );
 
     if (!confirmed) {
+
+      console.log(
+        "❌ Resignation cancelled"
+      );
+
       return;
     }
 
+    console.log(
+      "🏳️ Player confirmed resignation"
+    );
+
     resignGame();
+
   }
 
 
@@ -117,7 +114,10 @@ function ChessBoard({
 
       {/* HEADER */}
 
-      <div className="mb-5 text-center">
+      <div className="
+        mb-5
+        text-center
+      ">
 
         <h1 className="
           text-3xl
@@ -161,17 +161,24 @@ function ChessBoard({
       {/* CONTROLS */}
 
       <GameControls
+
         onUndo={undoMove}
+
         onRestart={handleGoToLobby}
+
         onResign={handleResign}
+
       />
 
 
       {/* PROMOTION */}
 
       <PromotionModal
+
         promotion={promotion}
+
         onSelect={promotePiece}
+
       />
 
 
@@ -180,10 +187,15 @@ function ChessBoard({
       {gameOver && (
 
         <GameOverModal
+
           status={status}
+
           gameEndReason={gameEndReason}
+
           onPlayAgain={playAgain}
+
           onGoToLobby={handleGoToLobby}
+
         />
 
       )}
@@ -191,6 +203,8 @@ function ChessBoard({
     </div>
 
   );
+
 }
+
 
 export default ChessBoard;

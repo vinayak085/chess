@@ -140,23 +140,25 @@ export function registerReconnectHandler(io, socket) {
 
       callback?.({
 
-        success: true,
+  success: true,
 
-        gameId,
+  gameData: {
 
-        color:
-          playerColor,
+    gameId,
 
-        playerName,
+    color: playerColor,
 
-        position,
+    playerName,
 
-        turn,
+    position,
 
-        players:
-          game.players,
+    turn,
 
-      });
+    players: game.players,
+
+  },
+
+});
 
 
       console.log(

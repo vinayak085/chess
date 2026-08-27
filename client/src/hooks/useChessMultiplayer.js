@@ -1,7 +1,14 @@
-import { useEffect, useCallback } from "react";
+import {
+  useEffect,
+  useCallback,
+} from "react";
+
 import { socket } from "../services/socket";
+import { useGameSounds } from "./useGameSounds";
+
 
 export function useChessMultiplayer({
+
   chess,
   gameData,
 
@@ -10,113 +17,134 @@ export function useChessMultiplayer({
   setGameOver,
   setPromotion,
   setGameEndReason,
+
 }) {
 
   // ==========================================
-  // UPDATE STATUS FROM CURRENT CHESS POSITION
+  // MOVE SOUND
   // ==========================================
 
-  const updateStatusFromChess = useCallback(() => {
-
-    // CHECKMATE
-    if (chess.isCheckmate()) {
-
-      const winner =
-        chess.turn() === "w"
-          ? "Black"
-          : "White";
-
-      setStatus(
-        `Checkmate! ${winner} wins!`
-      );
-
-      setGameOver(true);
-
-      return;
-    }
+  const {
+    playMoveSound,
+  } = useGameSounds();
 
 
-    // STALEMATE
-    if (chess.isStalemate()) {
+  // ==========================================
+  // UPDATE STATUS
+  // ==========================================
 
-      setStatus("Stalemate! Draw!");
-      setGameOver(true);
+  const updateStatusFromChess =
+    useCallback(() => {
 
-      return;
-    }
+      // CHECKMATE
+      if (chess.isCheckmate()) {
 
+        const winner =
+          chess.turn() === "w"
+            ? "Black"
+            : "White";
 
-    // THREEFOLD REPETITION
-    if (chess.isThreefoldRepetition()) {
+        setStatus(
+          `Checkmate! ${winner} wins!`
+        );
 
-      setStatus(
-        "Draw by threefold repetition!"
-      );
+        setGameOver(true);
 
-      setGameOver(true);
-
-      return;
-    }
-
-
-    // INSUFFICIENT MATERIAL
-    if (chess.isInsufficientMaterial()) {
-
-      setStatus(
-        "Draw by insufficient material!"
-      );
-
-      setGameOver(true);
-
-      return;
-    }
+        return;
+      }
 
 
-    // OTHER DRAW
-    if (chess.isDraw()) {
+      // STALEMATE
+      if (chess.isStalemate()) {
 
-      setStatus("Draw!");
-      setGameOver(true);
+        setStatus(
+          "Stalemate! Draw!"
+        );
 
-      return;
-    }
+        setGameOver(true);
+
+        return;
+      }
 
 
-    // CHECK
-    if (chess.inCheck()) {
+      // THREEFOLD REPETITION
+      if (
+        chess.isThreefoldRepetition()
+      ) {
 
+        setStatus(
+          "Draw by threefold repetition!"
+        );
+
+        setGameOver(true);
+
+        return;
+      }
+
+
+      // INSUFFICIENT MATERIAL
+      if (
+        chess.isInsufficientMaterial()
+      ) {
+
+        setStatus(
+          "Draw by insufficient material!"
+        );
+
+        setGameOver(true);
+
+        return;
+      }
+
+
+      // OTHER DRAW
+      if (chess.isDraw()) {
+
+        setStatus(
+          "Draw!"
+        );
+
+        setGameOver(true);
+
+        return;
+      }
+
+
+      // CHECK
+      if (chess.inCheck()) {
+
+        const player =
+          chess.turn() === "w"
+            ? "White"
+            : "Black";
+
+        setStatus(
+          `${player} is in check`
+        );
+
+        setGameOver(false);
+
+        return;
+      }
+
+
+      // NORMAL TURN
       const player =
         chess.turn() === "w"
           ? "White"
           : "Black";
 
       setStatus(
-        `${player} is in check`
+        `${player}'s turn`
       );
 
       setGameOver(false);
 
-      return;
-    }
-
-
-    // NORMAL TURN
-    const player =
-      chess.turn() === "w"
-        ? "White"
-        : "Black";
-
-    setStatus(
-      `${player}'s turn`
-    );
-
-    setGameOver(false);
-
-  }, [
-    chess,
-    setStatus,
-    setGameOver,
-  ]);
+    }, [
+      chess,
+      setStatus,
+      setGameOver,
+    ]);
 
 
   // ==========================================
@@ -132,33 +160,42 @@ export function useChessMultiplayer({
         data
       );
 
+
       try {
 
-        /*
-        ======================================
-        SERVER IS THE SOURCE OF TRUTH
-        ======================================
-        */
+        // ======================================
+        // LOAD SERVER POSITION
+        // ======================================
 
-        chess.load(data.position);
+        chess.load(
+          data.position
+        );
 
 
-        /*
-        Update React board
-        */
+        // ======================================
+        // UPDATE BOARD
+        // ======================================
 
         setPosition(
           data.position
         );
 
 
-        /*
-        Update status
-        */
+        // ======================================
+        // PLAY MOVE SOUND
+        // ======================================
+
+        playMoveSound();
+
+
+        // ======================================
+        // UPDATE STATUS
+        // ======================================
 
         updateStatusFromChess();
 
-      } catch (error) {
+      }
+      catch (error) {
 
         console.error(
           "FAILED TO LOAD SERVER POSITION:",
@@ -170,11 +207,19 @@ export function useChessMultiplayer({
     }
 
 
+    // ==========================================
+    // REGISTER SOCKET LISTENER
+    // ==========================================
+
     socket.on(
       "moveMade",
       handleMoveMade
     );
 
+
+    // ==========================================
+    // CLEANUP
+    // ==========================================
 
     return () => {
 
@@ -188,6 +233,7 @@ export function useChessMultiplayer({
   }, [
     chess,
     setPosition,
+    playMoveSound,
     updateStatusFromChess,
   ]);
 
@@ -201,6 +247,7 @@ export function useChessMultiplayer({
     console.log(
       "REQUESTING REMATCH"
     );
+
 
     socket.emit(
       "rematch",
@@ -223,6 +270,7 @@ export function useChessMultiplayer({
       "LEAVING GAME"
     );
 
+
     socket.emit(
       "leaveGame",
       {
@@ -238,36 +286,45 @@ export function useChessMultiplayer({
   // RESIGN
   // ==========================================
 
- function resignGame() {
+  function resignGame() {
 
-  console.log("RESIGNING GAME");
+    console.log(
+      "RESIGNING GAME"
+    );
 
-  console.log("GAME ID:", gameData.gameId);
+    console.log(
+      "GAME ID:",
+      gameData.gameId
+    );
 
-  socket.emit(
-    "resignGame",
-    {
-      gameId: gameData.gameId,
-    },
-    (response) => {
 
-      console.log(
-        "RESIGN RESPONSE FROM SERVER:",
-        response
-      );
+    socket.emit(
+      "resignGame",
+      {
+        gameId:
+          gameData.gameId,
+      },
+      (response) => {
 
-      if (!response?.success) {
-
-        console.error(
-          "RESIGN FAILED:",
-          response?.message
+        console.log(
+          "RESIGN RESPONSE FROM SERVER:",
+          response
         );
 
-      }
 
-    }
-  );
-}
+        if (!response?.success) {
+
+          console.error(
+            "RESIGN FAILED:",
+            response?.message
+          );
+
+        }
+
+      }
+    );
+
+  }
 
 
   // ==========================================
@@ -284,13 +341,23 @@ export function useChessMultiplayer({
       );
 
 
+      // Game ended
       setGameOver(true);
 
 
+      // Close promotion modal
       setPromotion(null);
 
-      // Tell UI that this game ended because of resignation
-      setGameEndReason("resignation");
+
+      // Tell UI why game ended
+      setGameEndReason(
+        "resignation"
+      );
+
+
+      // ======================================
+      // PLAYER WHO RESIGNED
+      // ======================================
 
       if (
         data.resignedColor ===
@@ -301,7 +368,13 @@ export function useChessMultiplayer({
           `You resigned. ${data.winnerPlayerName} wins!`
         );
 
-      } else {
+      }
+
+      // ======================================
+      // OTHER PLAYER
+      // ======================================
+
+      else {
 
         setStatus(
           `${data.resignedPlayerName} resigned. You win!`
@@ -331,6 +404,7 @@ export function useChessMultiplayer({
     gameData.color,
     setGameOver,
     setPromotion,
+    setGameEndReason,
     setStatus,
   ]);
 
@@ -351,28 +425,43 @@ export function useChessMultiplayer({
 
       try {
 
+        // Load new position
         chess.load(
           data.position
         );
 
 
+        // Update board
         setPosition(
           data.position
         );
 
 
-        setPromotion(null);
+        // Close promotion
+        setPromotion(
+          null
+        );
 
 
-        setGameOver(false);
+        // Game is active again
+        setGameOver(
+          false
+        );
 
-        setGameEndReason(null);
 
+        // Clear game-end reason
+        setGameEndReason(
+          null
+        );
+
+
+        // Reset status
         setStatus(
           "White's turn"
         );
 
-      } catch (error) {
+      }
+      catch (error) {
 
         console.error(
           "REMATCH ERROR:",
@@ -404,9 +493,14 @@ export function useChessMultiplayer({
     setPosition,
     setPromotion,
     setGameOver,
+    setGameEndReason,
     setStatus,
   ]);
 
+
+  // ==========================================
+  // RETURN
+  // ==========================================
 
   return {
 

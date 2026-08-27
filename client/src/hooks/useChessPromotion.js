@@ -1,6 +1,8 @@
 import { useCallback } from "react";
 import { socket } from "../services/socket";
 
+import { useGameSounds } from "./useGameSounds";
+
 export function useChessPromotion({
   chess,
   gameData,
